@@ -1,0 +1,7 @@
+{
+  "name": "Pizzas Shekinah",
+  "description": "Sistema de delivery oficial da Pizzas Shekinah. Peça suas pizzas favoritas pelo WhatsApp.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
