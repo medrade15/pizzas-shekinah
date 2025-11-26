@@ -24,6 +24,7 @@ export interface Product {
 export interface CartItem {
   id: string; // unique cart item id
   product: Product;
+  secondHalfProduct?: Product;
   selectedSize?: PriceSize;
   selectedCrust?: Crust;
   quantity: number;

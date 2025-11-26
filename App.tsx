@@ -59,6 +59,8 @@ const ProductModal = ({
   const [size, setSize] = useState<PriceSize | undefined>(product.isPizza ? PIZZA_SIZES[2] : undefined); // Default to Grande
   const [crust, setCrust] = useState<Crust | undefined>(undefined);
   const [quantity, setQuantity] = useState(1);
+  const [halfHalf, setHalfHalf] = useState(false);
+  const [secondHalf, setSecondHalf] = useState<Product | null>(null);
 
   // Use basePrice for drinks, or calculated price for pizzas
   const basePrice = product.isPizza ? (size?.price || 0) : (product.basePrice || 0);
@@ -69,6 +71,7 @@ const ProductModal = ({
     onAddToCart({
       id: Math.random().toString(36).substr(2, 9),
       product,
+      secondHalfProduct: halfHalf && secondHalf ? secondHalf : undefined,
       selectedSize: size,
       selectedCrust: crust,
       quantity,
@@ -111,7 +114,13 @@ const ProductModal = ({
                           name="size" 
                           className="w-5 h-5 text-shekinah-red focus:ring-shekinah-red border-gray-300"
                           checked={size?.label === s.label}
-                          onChange={() => setSize(s)}
+                          onChange={() => {
+                            setSize(s);
+                            if (s.label !== 'Média' && s.label !== 'Grande') {
+                              setHalfHalf(false);
+                              setSecondHalf(null);
+                            }
+                          }}
                         />
                         <div className="ml-3">
                           <span className={`block font-medium ${size?.label === s.label ? 'font-bold text-gray-800' : 'text-gray-600'}`}>{s.label}</span>
@@ -123,6 +132,51 @@ const ProductModal = ({
                   ))}
                 </div>
               </div>
+
+              {(size?.label === 'Média' || size?.label === 'Grande') && (
+                <div className="mb-6">
+                  <h4 className="font-semibold mb-2 text-gray-700">Metade a Metade:</h4>
+                  <div className="space-y-2">
+                    <label className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${halfHalf ? 'border-shekinah-red bg-red-50' : 'border-gray-200 hover:border-red-200'}`}>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          className="w-5 h-5 text-shekinah-red focus:ring-shekinah-red border-gray-300"
+                          checked={halfHalf}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            setHalfHalf(checked);
+                            if (!checked) setSecondHalf(null);
+                          }}
+                        />
+                        <span className={`ml-3 ${halfHalf ? 'font-bold text-gray-800' : 'text-gray-600'}`}>Escolher dois sabores</span>
+                      </div>
+                      <span className="text-sm font-medium text-gray-500">Mesmo preço</span>
+                    </label>
+                    {halfHalf && (
+                      <div className="mt-2">
+                        <select
+                          className="w-full p-3 border rounded-lg bg-white"
+                          value={secondHalf?.id || ''}
+                          onChange={(e) => {
+                            const sel = PRODUCTS.find(p => p.id === e.target.value);
+                            if (sel && sel.isPizza && sel.id !== product.id) {
+                              setSecondHalf(sel);
+                            } else {
+                              setSecondHalf(null);
+                            }
+                          }}
+                        >
+                          <option value="">Selecione o segundo sabor</option>
+                          {PRODUCTS.filter(p => p.isPizza && p.category === product.category && p.id !== product.id).map(p => (
+                            <option key={p.id} value={p.id}>{p.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               <div className="mb-6">
                 <h4 className="font-semibold mb-2 text-gray-700">Escolha a Borda:</h4>
@@ -183,7 +237,8 @@ const ProductModal = ({
         <div className="p-4 border-t bg-gray-50">
           <button 
             onClick={handleAdd}
-            className="w-full bg-shekinah-green text-white font-bold py-4 rounded-lg shadow-lg hover:bg-green-800 transition-colors flex justify-between px-6"
+            disabled={product.isPizza && halfHalf && !secondHalf}
+            className={`w-full bg-shekinah-green text-white font-bold py-4 rounded-lg shadow-lg transition-colors flex justify-between px-6 ${product.isPizza && halfHalf && !secondHalf ? 'opacity-60 cursor-not-allowed' : 'hover:bg-green-800'}`}
           >
             <span>Adicionar ao Pedido</span>
             <span>R$ {totalItemPrice.toFixed(2)}</span>
@@ -268,7 +323,11 @@ const CartModal = ({
     message += `*ITENS DO PEDIDO:*\n`;
     
     cart.forEach(item => {
-      message += `• ${item.quantity}x ${item.product.name}`;
+      if (item.secondHalfProduct) {
+        message += `• ${item.quantity}x Meia ${item.product.name} + Meia ${item.secondHalfProduct.name}`;
+      } else {
+        message += `• ${item.quantity}x ${item.product.name}`;
+      }
       if (item.product.isPizza && item.selectedSize) {
         message += ` (${item.selectedSize.label})`;
       }
@@ -318,7 +377,7 @@ const CartModal = ({
                     <div key={item.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex justify-between items-start">
                       <div>
                         <h4 className="font-bold text-gray-800">
-                          {item.quantity}x {item.product.name}
+                          {item.quantity}x {item.secondHalfProduct ? `Meia ${item.product.name} + Meia ${item.secondHalfProduct.name}` : item.product.name}
                         </h4>
                         <div className="text-sm text-gray-600">
                           {item.product.isPizza && item.selectedSize && (
