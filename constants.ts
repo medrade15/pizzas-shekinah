@@ -1,6 +1,6 @@
 import { Product, PriceSize, Crust } from './types';
 
-export const PHONE_NUMBER = '5562995438553';
+export const PHONE_NUMBER = '5561996125274';
 export const DELIVERY_FEE = 5.00;
 
 export const PIZZA_SIZES: PriceSize[] = [
