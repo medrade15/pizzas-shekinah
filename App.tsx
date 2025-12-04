@@ -90,7 +90,14 @@ const ProductModal = ({
             src={product.image} 
             alt={product.name} 
             className="w-full h-full object-cover" 
-            onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/placeholder.svg'; }}
+            onError={(e) => {
+              const img = e.currentTarget as HTMLImageElement;
+              if (img.src.endsWith('.jpg')) {
+                img.src = img.src.replace('.jpg', '.png');
+              } else {
+                img.src = '/images/placeholder.svg';
+              }
+            }}
           />
           <button onClick={onClose} className="absolute top-3 right-3 bg-white text-black w-8 h-8 rounded-full shadow-lg flex items-center justify-center">
             <CloseIcon />
@@ -168,7 +175,7 @@ const ProductModal = ({
                           }}
                         >
                           <option value="">Selecione o segundo sabor</option>
-                          {PRODUCTS.filter(p => p.isPizza && p.category === product.category && p.id !== product.id).map(p => (
+                          {PRODUCTS.filter(p => p.isPizza && p.id !== product.id).map(p => (
                             <option key={p.id} value={p.id}>{p.name}</option>
                           ))}
                         </select>
@@ -678,7 +685,14 @@ const App = () => {
                   src={product.image} 
                   alt={product.name} 
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/placeholder.svg'; }}
+                  onError={(e) => {
+                    const img = e.currentTarget as HTMLImageElement;
+                    if (img.src.endsWith('.jpg')) {
+                      img.src = img.src.replace('.jpg', '.png');
+                    } else {
+                      img.src = '/images/placeholder.svg';
+                    }
+                  }}
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
                    <h3 className="text-white font-bold text-lg shadow-black drop-shadow-md">{product.name}</h3>
