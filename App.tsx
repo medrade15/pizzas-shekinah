@@ -25,7 +25,7 @@ const isOpenNow = () => {
 };
 
 // 1. Header Component
-const Header = ({ cartCount, onOpenCart }: { cartCount: number, onOpenCart: () => void }) => (
+const Header = ({ cartCount, onOpenCart, onOpenInfo }: { cartCount: number, onOpenCart: () => void, onOpenInfo: () => void }) => (
   <header className="z-10">
     <div className="relative bg-gradient-to-b from-shekinah-red/80 via-shekinah-gold/70 to-shekinah-red/80 rounded-b-3xl shadow">
       <div className="relative container mx-auto px-4 pt-3 flex justify-end">
@@ -66,10 +66,13 @@ const Header = ({ cartCount, onOpenCart }: { cartCount: number, onOpenCart: () =
           <div className="text-2xl"><i className="fas fa-clock"></i></div>
           <div className="mt-1 text-sm">Horários</div>
         </div>
-        <div>
-          <div className="text-2xl"><i className="fas fa-plus"></i></div>
+        <button
+          onClick={onOpenInfo}
+          className="text-left transition-transform hover:scale-105"
+        >
+          <div className="text-2xl text-shekinah-green"><i className="fas fa-plus"></i></div>
           <div className="mt-1 text-sm">Informações</div>
-        </div>
+        </button>
       </div>
       <div className="mt-4 text-sm text-gray-900">Funcionamento <span className={`font-bold ${isOpenNow() ? 'text-green-600' : 'text-red-600'}`}>{isOpenNow() ? 'ABERTO' : 'FECHADO'}</span> <span className="ml-2 text-gray-500">(18:00 – 23:00)</span></div>
       <div className="mt-4 max-w-3xl mx-auto bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm p-3 rounded-xl">
@@ -679,6 +682,36 @@ const CartFloatingBar = ({ cart, onOpenCart }: { cart: CartItem[], onOpenCart: (
   );
 };
 
+const InfoModal = ({ onClose }: { onClose: () => void }) => {
+  return (
+    <div className="fixed inset-0 z-[65] flex items-center justify-center p-4 bg-black bg-opacity-70 animate-fade-in">
+      <div className="bg-white rounded-xl w-full max-w-md overflow-hidden shadow-2xl">
+        <div className="p-6">
+          <h3 className="text-2xl font-bold text-gray-800">Precisa de ajuda?</h3>
+          <p className="text-gray-600 mt-1 mb-4">Está com dúvida de como fazer o pedido? Entre em contato.</p>
+          <div className="flex gap-3">
+            <button 
+              onClick={onClose}
+              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 font-bold hover:bg-gray-100 transition-colors"
+            >
+              Fechar
+            </button>
+            <button 
+              onClick={() => {
+                const msg = encodeURIComponent('Olá! Estou com dúvida sobre como fazer o pedido.');
+                window.open(`https://wa.me/${PHONE_NUMBER}?text=${msg}`, '_blank');
+              }}
+              className="flex-1 bg-shekinah-green text-white font-bold py-2 rounded-lg hover:bg-green-800 transition-colors flex items-center justify-center gap-2"
+            >
+              <WhatsappIcon /> Falar no WhatsApp
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // --- Main App Component ---
 
 const App = () => {
@@ -686,6 +719,7 @@ const App = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
 
   const filteredProducts = useMemo(() => 
     PRODUCTS.filter(p => p.category === activeCategory), 
@@ -703,7 +737,7 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 pb-20">
-      <Header cartCount={cart.length} onOpenCart={() => setIsCartOpen(true)} />
+      <Header cartCount={cart.length} onOpenCart={() => setIsCartOpen(true)} onOpenInfo={() => setIsInfoOpen(true)} />
       {!isOpenNow() && (
         <div className="container mx-auto px-4 mt-6">
           <div className="relative overflow-hidden rounded-2xl shadow-lg">
@@ -831,6 +865,10 @@ const App = () => {
           onClose={() => setSelectedProduct(null)} 
           onAddToCart={addToCart} 
         />
+      )}
+
+      {isInfoOpen && (
+        <InfoModal onClose={() => setIsInfoOpen(false)} />
       )}
 
       {isCartOpen && (
