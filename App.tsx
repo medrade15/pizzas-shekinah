@@ -335,13 +335,15 @@ const CartModal = ({
   const [gpsLocation, setGpsLocation] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<Order['paymentMethod']>('Pix');
   const [changeFor, setChangeFor] = useState('');
+  const [fulfillment, setFulfillment] = useState<'Entrega' | 'Retirada na Loja'>('Entrega');
   
   // States for Geolocation and Validation
   const [locationLoading, setLocationLoading] = useState(false);
   const [errors, setErrors] = useState<{name: boolean, address: boolean}>({ name: false, address: false });
 
   const subtotal = cart.reduce((acc, item) => acc + item.totalPrice, 0);
-  const total = subtotal + DELIVERY_FEE;
+  const deliveryFee = fulfillment === 'Entrega' ? DELIVERY_FEE : 0;
+  const total = subtotal + deliveryFee;
 
   const getLocation = () => {
     setLocationLoading(true);
@@ -369,7 +371,7 @@ const CartModal = ({
     // Reset errors
     const newErrors = {
         name: !customerName.trim(),
-        address: !addressText.trim()
+        address: fulfillment === 'Entrega' ? !addressText.trim() : false
     };
     
     setErrors(newErrors);
@@ -383,9 +385,12 @@ const CartModal = ({
     let message = `*NOVO PEDIDO - PIZZAS SHEKINAH*\n`;
     message += `--------------------------------\n`;
     message += `*Cliente:* ${customerName}\n`;
-    message += `*Endereço:* ${addressText}\n`;
-    if (gpsLocation) {
-        message += `*📍 Localização GPS:* ${gpsLocation}\n`;
+    message += `*Tipo:* ${fulfillment}\n`;
+    if (fulfillment === 'Entrega') {
+      message += `*Endereço:* ${addressText}\n`;
+      if (gpsLocation) {
+          message += `*📍 Localização GPS:* ${gpsLocation}\n`;
+      }
     }
     message += `--------------------------------\n`;
     message += `*ITENS DO PEDIDO:*\n`;
@@ -410,7 +415,7 @@ const CartModal = ({
     
     message += `--------------------------------\n`;
     message += `*Subtotal:* R$ ${subtotal.toFixed(2)}\n`;
-    message += `*Taxa de Entrega:* R$ ${DELIVERY_FEE.toFixed(2)}\n`;
+    message += `*Taxa de Entrega:* R$ ${deliveryFee.toFixed(2)}\n`;
     message += `*TOTAL:* R$ ${total.toFixed(2)}\n`;
     message += `--------------------------------\n`;
     message += `*Pagamento:* ${paymentMethod}\n`;
@@ -476,7 +481,25 @@ const CartModal = ({
                 </div>
               ) : (
                 <div className="space-y-6 pb-6">
-                  {/* Checkout Form */}
+                  {/* Método de Entrega */}
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Como prefere receber?</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {['Entrega', 'Retirada na Loja'].map(m => (
+                        <button
+                          key={m}
+                          onClick={() => setFulfillment(m as 'Entrega' | 'Retirada na Loja')}
+                          className={`p-3 rounded-lg text-sm font-medium transition-all duration-200 border ${
+                            fulfillment === m
+                              ? 'bg-shekinah-green text-white border-shekinah-green shadow-md transform scale-[1.02]'
+                              : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          {m}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                   
                   {/* Nome */}
                   <div>
@@ -501,71 +524,75 @@ const CartModal = ({
                     {errors.name && <p className="text-red-500 text-xs mt-1">Por favor, informe seu nome.</p>}
                   </div>
 
-                  {/* Endereço Manual */}
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">
-                        Endereço Completo <span className="text-red-500">*</span>
-                    </label>
-                    <textarea 
-                        className={`w-full p-3 border rounded-lg outline-none resize-none transition-all focus:ring-2 focus:ring-shekinah-red/20 ${errors.address ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
-                        rows={3}
-                        placeholder="Rua, Número, Quadra, Lote, Bairro e Complemento..."
-                        value={addressText}
-                        onChange={e => {
-                            setAddressText(e.target.value);
-                            if(e.target.value) setErrors(prev => ({...prev, address: false}));
-                        }}
-                    ></textarea>
-                    {errors.address && (
-                        <p className="text-red-500 text-xs mt-1">O endereço é obrigatório para a entrega.</p>
-                    )}
-                  </div>
+                  {/* Endereço Manual (apenas para Entrega) */}
+                  {fulfillment === 'Entrega' && (
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">
+                          Endereço Completo <span className="text-red-500">*</span>
+                      </label>
+                      <textarea 
+                          className={`w-full p-3 border rounded-lg outline-none resize-none transition-all focus:ring-2 focus:ring-shekinah-red/20 ${errors.address ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
+                          rows={3}
+                          placeholder="Rua, Número, Quadra, Lote, Bairro e Complemento..."
+                          value={addressText}
+                          onChange={e => {
+                              setAddressText(e.target.value);
+                              if(e.target.value) setErrors(prev => ({...prev, address: false}));
+                          }}
+                      ></textarea>
+                      {errors.address && (
+                          <p className="text-red-500 text-xs mt-1">O endereço é obrigatório para a entrega.</p>
+                      )}
+                    </div>
+                  )}
 
-                  {/* Localização GPS (Separado) */}
-                  <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-                     <div className="flex items-start gap-3">
-                         <div className={`mt-1 rounded-full p-2 ${gpsLocation ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'}`}>
-                            <MapIcon />
-                         </div>
-                         <div className="flex-1">
-                             <h4 className="font-bold text-gray-800 text-sm">Facilite sua entrega</h4>
-                             <p className="text-xs text-gray-600 mb-3">Envie sua localização atual para o entregador chegar mais rápido.</p>
-                             
-                             {gpsLocation ? (
-                                 <div className="flex items-center justify-between bg-white border border-green-200 rounded-lg p-3 shadow-sm">
-                                     <div className="flex items-center gap-2 text-green-700">
-                                         <CheckIcon />
-                                         <span className="text-sm font-bold">Localização anexada!</span>
-                                     </div>
-                                     <button 
-                                        onClick={() => setGpsLocation(null)}
-                                        className="text-xs text-red-500 hover:text-red-700 underline font-medium"
-                                     >
-                                         Remover
-                                     </button>
-                                 </div>
-                             ) : (
-                                 <button 
-                                    onClick={getLocation}
-                                    disabled={locationLoading}
-                                    className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-all shadow-md active:scale-95"
-                                 >
-                                    {locationLoading ? (
-                                        <>
-                                            <i className="fas fa-spinner fa-spin"></i>
-                                            Buscando...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <GpsIcon />
-                                            Enviar Minha Localização
-                                        </>
-                                    )}
-                                 </button>
-                             )}
-                         </div>
-                     </div>
-                  </div>
+                  {/* Localização GPS (apenas para Entrega) */}
+                  {fulfillment === 'Entrega' && (
+                    <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
+                       <div className="flex items-start gap-3">
+                           <div className={`mt-1 rounded-full p-2 ${gpsLocation ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'}`}>
+                              <MapIcon />
+                           </div>
+                           <div className="flex-1">
+                               <h4 className="font-bold text-gray-800 text-sm">Facilite sua entrega</h4>
+                               <p className="text-xs text-gray-600 mb-3">Envie sua localização atual para o entregador chegar mais rápido.</p>
+                               
+                               {gpsLocation ? (
+                                   <div className="flex items-center justify-between bg-white border border-green-200 rounded-lg p-3 shadow-sm">
+                                       <div className="flex items-center gap-2 text-green-700">
+                                           <CheckIcon />
+                                           <span className="text-sm font-bold">Localização anexada!</span>
+                                       </div>
+                                       <button 
+                                          onClick={() => setGpsLocation(null)}
+                                          className="text-xs text-red-500 hover:text-red-700 underline font-medium"
+                                       >
+                                           Remover
+                                       </button>
+                                   </div>
+                               ) : (
+                                   <button 
+                                      onClick={getLocation}
+                                      disabled={locationLoading}
+                                      className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-all shadow-md active:scale-95"
+                                   >
+                                      {locationLoading ? (
+                                          <>
+                                              <i className="fas fa-spinner fa-spin"></i>
+                                              Buscando...
+                                          </>
+                                      ) : (
+                                          <>
+                                              <GpsIcon />
+                                              Enviar Minha Localização
+                                          </>
+                                      )}
+                                   </button>
+                               )}
+                           </div>
+                       </div>
+                    </div>
+                  )}
 
                   {/* Forma de Pagamento */}
                   <div>
@@ -614,7 +641,7 @@ const CartModal = ({
               </div>
               <div className="flex justify-between">
                 <span>Taxa de Entrega</span>
-                <span>R$ {DELIVERY_FEE.toFixed(2)}</span>
+                <span>R$ {deliveryFee.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-lg font-bold text-shekinah-black pt-2 border-t mt-2">
                 <span>Total</span>
@@ -627,7 +654,7 @@ const CartModal = ({
                 onClick={() => setStep('checkout')}
                 className="w-full bg-shekinah-green text-white font-bold py-3 rounded-lg hover:bg-green-800 transition-colors shadow-lg"
               >
-                Continuar para Entrega
+                Continuar
               </button>
             ) : (
               <div className="flex gap-3">
