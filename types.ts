@@ -27,6 +27,7 @@ export interface CartItem {
   secondHalfProduct?: Product;
   selectedSize?: PriceSize;
   selectedCrust?: Crust;
+  selectedDrinkFlavor?: string;
   quantity: number;
   totalPrice: number;
 }

@@ -18,6 +18,14 @@ export const PIZZA_CRUSTS: Crust[] = [
   { name: 'Doce de Leite', price: 13.00 },
 ];
 
+export const DRINK_FLAVORS: string[] = [
+  'Coca-Cola',
+  'Guaraná',
+  'Fanta Laranja',
+  'Fanta Uva',
+  'Sprite'
+];
+
 // Gera um slug a partir do nome (minúsculo, sem acentos, com hífens)
 const toSlug = (name: string): string => {
   return name

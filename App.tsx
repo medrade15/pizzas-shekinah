@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { PRODUCTS, DELIVERY_FEE, PIZZA_SIZES, PHONE_NUMBER } from './constants';
+import { PRODUCTS, DELIVERY_FEE, PIZZA_SIZES, PHONE_NUMBER, DRINK_FLAVORS } from './constants';
 import { Product, CartItem, Order, Category, PriceSize, Crust } from './types';
 
 // Icons
@@ -61,6 +61,7 @@ const ProductModal = ({
   const [quantity, setQuantity] = useState(1);
   const [halfHalf, setHalfHalf] = useState(false);
   const [secondHalf, setSecondHalf] = useState<Product | null>(null);
+  const [drinkFlavor, setDrinkFlavor] = useState<string>('');
 
   // Use basePrice for drinks, or calculated price for pizzas
   const basePrice = product.isPizza ? (size?.price || 0) : (product.basePrice || 0);
@@ -74,6 +75,7 @@ const ProductModal = ({
       secondHalfProduct: halfHalf && secondHalf ? secondHalf : undefined,
       selectedSize: size,
       selectedCrust: crust,
+      selectedDrinkFlavor: !product.isPizza && drinkFlavor ? drinkFlavor : undefined,
       quantity,
       totalPrice: totalItemPrice
     });
@@ -221,6 +223,22 @@ const ProductModal = ({
             </>
           )}
 
+          {!product.isPizza && (
+            <div className="mb-6">
+              <h4 className="font-semibold mb-2 text-gray-700">Escolha o Sabor:</h4>
+              <select
+                className="w-full p-3 border rounded-lg bg-white"
+                value={drinkFlavor}
+                onChange={(e) => setDrinkFlavor(e.target.value)}
+              >
+                <option value="">Selecione o sabor</option>
+                {DRINK_FLAVORS.map((f) => (
+                  <option key={f} value={f}>{f}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div className="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
             <span className="font-semibold">Quantidade:</span>
             <div className="flex items-center gap-4">
@@ -244,8 +262,8 @@ const ProductModal = ({
         <div className="p-4 border-t bg-gray-50">
           <button 
             onClick={handleAdd}
-            disabled={product.isPizza && halfHalf && !secondHalf}
-            className={`w-full bg-shekinah-green text-white font-bold py-4 rounded-lg shadow-lg transition-colors flex justify-between px-6 ${product.isPizza && halfHalf && !secondHalf ? 'opacity-60 cursor-not-allowed' : 'hover:bg-green-800'}`}
+            disabled={(product.isPizza && halfHalf && !secondHalf) || (!product.isPizza && !drinkFlavor)}
+            className={`w-full bg-shekinah-green text-white font-bold py-4 rounded-lg shadow-lg transition-colors flex justify-between px-6 ${((product.isPizza && halfHalf && !secondHalf) || (!product.isPizza && !drinkFlavor)) ? 'opacity-60 cursor-not-allowed' : 'hover:bg-green-800'}`}
           >
             <span>Adicionar ao Pedido</span>
             <span>R$ {totalItemPrice.toFixed(2)}</span>
@@ -341,6 +359,9 @@ const CartModal = ({
       if (item.selectedCrust) {
         message += `\n  + Borda: ${item.selectedCrust.name}`;
       }
+      if (!item.product.isPizza && item.selectedDrinkFlavor) {
+        message += `\n  + Sabor: ${item.selectedDrinkFlavor}`;
+      }
       message += ` - R$ ${item.totalPrice.toFixed(2)}\n`;
     });
     
@@ -392,6 +413,9 @@ const CartModal = ({
                           )}
                           {item.selectedCrust && (
                             <span className="block text-shekinah-green">+ {item.selectedCrust.name}</span>
+                          )}
+                          {!item.product.isPizza && item.selectedDrinkFlavor && (
+                            <span className="block">Sabor: {item.selectedDrinkFlavor}</span>
                           )}
                         </div>
                       </div>
