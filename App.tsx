@@ -18,30 +18,65 @@ const MapIcon = () => <i className="fas fa-map-marked-alt"></i>;
 
 // --- Subcomponents ---
 
+const isOpenNow = () => {
+  const now = new Date();
+  const hour = now.getHours();
+  return hour >= 18 && hour < 23;
+};
+
 // 1. Header Component
 const Header = ({ cartCount, onOpenCart }: { cartCount: number, onOpenCart: () => void }) => (
-  <header className="sticky top-0 z-50 bg-shekinah-red text-white shadow-lg">
-    <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-      <div className="flex items-center gap-2">
-        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-shekinah-red font-bold text-xl">
-          S
-        </div>
-        <div>
-          <h1 className="text-xl font-bold leading-none">PIZZAS</h1>
-          <h2 className="text-sm font-light text-shekinah-gold leading-none tracking-widest">SHEKINAH</h2>
+  <header className="z-10">
+    <div className="relative bg-gradient-to-b from-shekinah-red/80 via-shekinah-gold/70 to-shekinah-red/80 rounded-b-3xl shadow">
+      <div className="relative container mx-auto px-4 pt-3 flex justify-end">
+        <button 
+          onClick={onOpenCart}
+          className="relative flex items-center gap-2 bg-shekinah-red text-white px-4 py-2 rounded-full shadow hover:bg-red-700 transition-colors"
+        >
+          <span className="text-lg"><CartIcon /></span>
+          <span className="text-sm font-semibold">Carrinho</span>
+          {cartCount > 0 && (
+            <span className="ml-2 bg-shekinah-gold text-shekinah-black text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center border border-shekinah-red">
+              {cartCount}
+            </span>
+          )}
+        </button>
+      </div>
+      <div className="relative container mx-auto px-4 pb-16 flex justify-center">
+        <div className="w-32 h-32 md:w-36 md:h-36 rounded-2xl bg-white shadow-xl ring-4 ring-white/30 -mb-12 flex items-center justify-center">
+          <img
+            src="/images/logo.png"
+            alt="Logo"
+            className="w-32 h-32 md:w-36 md:h-36 rounded-full object-cover"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/placeholder.svg'; }}
+          />
         </div>
       </div>
-      <button 
-        onClick={onOpenCart}
-        className="relative p-2 hover:bg-red-700 rounded-full transition-colors"
-      >
-        <span className="text-2xl"><CartIcon /></span>
-        {cartCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-shekinah-gold text-shekinah-black text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-shekinah-red">
-            {cartCount}
-          </span>
-        )}
-      </button>
+    </div>
+
+    <div className="container mx-auto px-4 mt-16 text-center">
+      <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">PIZZAS SHEKINAH</h1>
+      <div className="mt-2 text-gray-600">Entrega <span className="font-semibold">40–60 min</span></div>
+      <div className="mt-4 grid grid-cols-3 gap-6 max-w-2xl mx-auto text-gray-800">
+        <div>
+          <div className="text-2xl"><i className="fas fa-credit-card"></i></div>
+          <div className="mt-1 text-sm">Pagamentos</div>
+        </div>
+        <div>
+          <div className="text-2xl"><i className="fas fa-clock"></i></div>
+          <div className="mt-1 text-sm">Horários</div>
+        </div>
+        <div>
+          <div className="text-2xl"><i className="fas fa-plus"></i></div>
+          <div className="mt-1 text-sm">Informações</div>
+        </div>
+      </div>
+      <div className="mt-4 text-sm text-gray-900">Funcionamento <span className={`font-bold ${isOpenNow() ? 'text-green-600' : 'text-red-600'}`}>{isOpenNow() ? 'ABERTO' : 'FECHADO'}</span> <span className="ml-2 text-gray-500">(18:00 – 23:00)</span></div>
+      <div className="mt-4 max-w-3xl mx-auto bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm p-3 rounded-xl">
+        <span className="mr-2"><i className="fas fa-exclamation-triangle"></i></span>
+        AVISO: Pedido com pagamento via PIX é obrigatório enviar o comprovante do pagamento no nosso Whatsapp para que seu pedido seja aprovado
+        <span className="ml-2"><i className="fas fa-exclamation-triangle"></i></span>
+      </div>
     </div>
   </header>
 );
@@ -109,6 +144,11 @@ const ProductModal = ({
         <div className="p-6 overflow-y-auto flex-1">
           <h3 className="text-2xl font-bold text-gray-800">{product.name}</h3>
           <p className="text-gray-600 mt-1 mb-4">{product.description}</p>
+          {!isOpenNow() && (
+            <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm p-3 rounded-lg">
+              Estamos fechados. Pedidos somente entre 18:00 e 23:00.
+            </div>
+          )}
 
           {product.isPizza && (
             <>
@@ -244,14 +284,14 @@ const ProductModal = ({
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300"
+                className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center hover:bg-red-700"
               >
                 <MinusIcon />
               </button>
               <span className="font-bold text-xl">{quantity}</span>
               <button 
                 onClick={() => setQuantity(quantity + 1)}
-                className="w-8 h-8 rounded-full bg-shekinah-red text-white flex items-center justify-center hover:bg-red-700"
+                className="w-8 h-8 rounded-full bg-shekinah-green text-white flex items-center justify-center hover:bg-green-800"
               >
                 <PlusIcon />
               </button>
@@ -262,8 +302,8 @@ const ProductModal = ({
         <div className="p-4 border-t bg-gray-50">
           <button 
             onClick={handleAdd}
-            disabled={(product.isPizza && halfHalf && !secondHalf) || (!product.isPizza && !drinkFlavor)}
-            className={`w-full bg-shekinah-green text-white font-bold py-4 rounded-lg shadow-lg transition-colors flex justify-between px-6 ${((product.isPizza && halfHalf && !secondHalf) || (!product.isPizza && !drinkFlavor)) ? 'opacity-60 cursor-not-allowed' : 'hover:bg-green-800'}`}
+            disabled={(product.isPizza && halfHalf && !secondHalf) || (!product.isPizza && !drinkFlavor) || !isOpenNow()}
+            className={`w-full bg-shekinah-green text-white font-bold py-4 rounded-lg shadow-lg transition-colors flex justify-between px-6 ${(((product.isPizza && halfHalf && !secondHalf) || (!product.isPizza && !drinkFlavor) || !isOpenNow())) ? 'opacity-60 cursor-not-allowed' : 'hover:bg-green-800'}`}
           >
             <span>Adicionar ao Pedido</span>
             <span>R$ {totalItemPrice.toFixed(2)}</span>
@@ -596,7 +636,8 @@ const CartModal = ({
                 </button>
                 <button 
                   onClick={validateAndSend}
-                  className="flex-1 bg-green-500 text-white font-bold py-3 rounded-lg hover:bg-green-600 transition-all shadow-lg flex items-center justify-center gap-2 transform active:scale-95"
+                  disabled={!isOpenNow()}
+                  className={`flex-1 bg-green-500 text-white font-bold py-3 rounded-lg transition-all shadow-lg flex items-center justify-center gap-2 transform active:scale-95 ${!isOpenNow() ? 'opacity-60 cursor-not-allowed' : 'hover:bg-green-600'}`}
                 >
                   <WhatsappIcon /> Enviar Pedido
                 </button>
@@ -663,15 +704,28 @@ const App = () => {
   return (
     <div className="min-h-screen bg-gray-100 pb-20">
       <Header cartCount={cart.length} onOpenCart={() => setIsCartOpen(true)} />
+      {!isOpenNow() && (
+        <div className="container mx-auto px-4 mt-6">
+          <div className="relative overflow-hidden rounded-2xl shadow-lg">
+            <div className="absolute inset-0 bg-gradient-to-r from-shekinah-red via-shekinah-gold to-shekinah-red opacity-90"></div>
+            <div className="relative z-10 p-6 text-white flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                  <i className="fas fa-pizza-slice"></i>
+                </div>
+                <div>
+                  <div className="text-lg font-extrabold tracking-tight">Estamos fora do horário de atendimento</div>
+                  <div className="text-sm">Pedidos disponíveis entre <span className="font-bold">18:00</span> e <span className="font-bold">23:00</span></div>
+                </div>
+              </div>
+              <div className="bg-white/15 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold shadow">
+                Voltamos às 18:00 🍕
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       
-      {/* Banner / Hero */}
-      <div className="bg-shekinah-black text-white py-8 px-4 text-center bg-[url('https://images.unsplash.com/photo-1590947132387-155cc02f3212?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center bg-no-repeat relative">
-         <div className="absolute inset-0 bg-black bg-opacity-60"></div>
-         <div className="relative z-10">
-            <h2 className="text-3xl font-bold mb-2">A melhor pizza da região!</h2>
-            <p className="text-gray-200">Taxa de entrega fixa: R$ 5,00 em toda cidade.</p>
-         </div>
-      </div>
 
       {/* Category Navigation */}
       <nav className="sticky top-[64px] z-40 bg-white shadow-sm overflow-x-auto whitespace-nowrap p-4 flex gap-4 no-scrollbar">
@@ -696,12 +750,18 @@ const App = () => {
       </nav>
 
       {/* Product Grid */}
-      <main className="container mx-auto px-4 py-6">
+      <main id="menu" className="container mx-auto px-4 py-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
             <div 
               key={product.id}
-              onClick={() => setSelectedProduct(product)}
+              onClick={() => {
+                if (isOpenNow()) {
+                  setSelectedProduct(product);
+                } else {
+                  alert('Estamos fechados. Pedidos somente entre 18:00 e 23:00.');
+                }
+              }}
               className="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition-shadow transform hover:-translate-y-1 duration-300 group"
             >
               <div className="h-48 overflow-hidden relative">
