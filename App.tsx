@@ -746,6 +746,17 @@ const App = () => {
         <div className="container mx-auto px-4 text-center text-gray-500 text-sm">
           <p className="font-bold text-gray-800">Pizzas Shekinah</p>
           <p>Delivery/Retirada: (62) 99543-8553</p>
+          <p className="mt-1">
+            <a 
+              href="https://www.instagram.com/shekinah_pizzaria23_?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="inline-flex items-center gap-2 text-pink-600 hover:text-pink-700 font-semibold"
+            >
+              <i className="fab fa-instagram"></i>
+              @shekinah_pizzaria23_
+            </a>
+          </p>
           <p className="mt-2">© {new Date().getFullYear()} Todos os direitos reservados.</p>
         </div>
       </footer>
