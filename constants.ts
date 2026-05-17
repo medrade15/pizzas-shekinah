@@ -82,15 +82,7 @@ export const PRODUCTS: Product[] = [
   createPizza('33', 'Brigadeiro', 'Mussarela, chocolate e confete.', 'Doces'),
 
   // Bebidas
-  {
-    id: '34',
-    name: 'Refrigerante Lata',
-    description: '350ml - Diversos sabores',
-    category: 'Bebidas',
-    isPizza: false,
-    basePrice: 7.00,
-    image: imagePathFor('Refrigerante Lata')
-  },
+
   {
     id: '35',
     name: 'Refrigerante 2L',
