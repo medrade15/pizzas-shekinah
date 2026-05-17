@@ -4,9 +4,9 @@ export const PHONE_NUMBER = '5561996125274';
 export const DELIVERY_FEE = 5.00;
 
 export const PIZZA_SIZES: PriceSize[] = [
-  { label: 'Pequena', slices: 4, price: 45.00 },
-  { label: 'Média', slices: 6, price: 55.00 },
-  { label: 'Grande', slices: 8, price: 65.00 },
+  { label: 'Pequena', slices: 4, price: 50.00 },
+  { label: 'Média', slices: 6, price: 60.00 },
+  { label: 'Grande', slices: 8, price: 70.00 },
 ];
 
 export const PIZZA_CRUSTS: Crust[] = [
@@ -14,16 +14,14 @@ export const PIZZA_CRUSTS: Crust[] = [
   { name: 'Catupiry', price: 13.00 },
   { name: 'Cheddar', price: 13.00 },
   { name: 'Chocolate', price: 13.00 },
-  { name: 'Chocolate Branco', price: 13.00 },
-  { name: 'Doce de Leite', price: 13.00 },
+
+  
 ];
 
 export const DRINK_FLAVORS: string[] = [
   'Coca-Cola',
   'Guaraná',
-  'Fanta Laranja',
-  'Fanta Uva',
-  'Sprite'
+  
 ];
 
 // Gera um slug a partir do nome (minúsculo, sem acentos, com hífens)
@@ -81,7 +79,6 @@ export const PRODUCTS: Product[] = [
   createPizza('28', 'Banana com Canela', 'Mussarela, banana, açúcar e canela.', 'Doces'),
   createPizza('29', 'Doce de Leite', 'Mussarela, doce de leite e paçoca.', 'Doces'),
   createPizza('30', 'Prestígio', 'Mussarela, chocolate e coco ralado.', 'Doces'),
-  createPizza('31', 'Pistache', 'Mussarela, ganache de pistache e gotas de chocolate.', 'Doces'),
   createPizza('33', 'Brigadeiro', 'Mussarela, chocolate e confete.', 'Doces'),
 
   // Bebidas
