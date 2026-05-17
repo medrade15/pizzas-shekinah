@@ -82,7 +82,6 @@ export const PRODUCTS: Product[] = [
   createPizza('29', 'Doce de Leite', 'Mussarela, doce de leite e paçoca.', 'Doces'),
   createPizza('30', 'Prestígio', 'Mussarela, chocolate e coco ralado.', 'Doces'),
   createPizza('31', 'Pistache', 'Mussarela, ganache de pistache e gotas de chocolate.', 'Doces'),
-  createPizza('32', 'Romeu e Julieta', 'Mussarela, goiabada e catupiry.', 'Doces'),
   createPizza('33', 'Brigadeiro', 'Mussarela, chocolate e confete.', 'Doces'),
 
   // Bebidas
