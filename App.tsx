@@ -147,12 +147,6 @@ const ProductModal = ({
         <div className="p-6 overflow-y-auto flex-1">
           <h3 className="text-2xl font-bold text-gray-800">{product.name}</h3>
           <p className="text-gray-600 mt-1 mb-4">{product.description}</p>
-          {!isOpenNow() && (
-            <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm p-3 rounded-lg">
-              Estamos fechados. Pedidos somente entre 18:00 e 23:00.
-            </div>
-          )}
-
           {product.isPizza && (
             <>
               <div className="mb-6">
@@ -305,8 +299,8 @@ const ProductModal = ({
         <div className="p-4 border-t bg-gray-50">
           <button 
             onClick={handleAdd}
-            disabled={(product.isPizza && halfHalf && !secondHalf) || (!product.isPizza && !drinkFlavor) || !isOpenNow()}
-            className={`w-full bg-shekinah-green text-white font-bold py-4 rounded-lg shadow-lg transition-colors flex justify-between px-6 ${(((product.isPizza && halfHalf && !secondHalf) || (!product.isPizza && !drinkFlavor) || !isOpenNow())) ? 'opacity-60 cursor-not-allowed' : 'hover:bg-green-800'}`}
+            disabled={(product.isPizza && halfHalf && !secondHalf) || (!product.isPizza && !drinkFlavor)}
+            className={`w-full bg-shekinah-green text-white font-bold py-4 rounded-lg shadow-lg transition-colors flex justify-between px-6 ${((product.isPizza && halfHalf && !secondHalf) || (!product.isPizza && !drinkFlavor)) ? 'opacity-60 cursor-not-allowed' : 'hover:bg-green-800'}`}
           >
             <span>Adicionar ao Pedido</span>
             <span>R$ {totalItemPrice.toFixed(2)}</span>
@@ -666,8 +660,7 @@ const CartModal = ({
                 </button>
                 <button 
                   onClick={validateAndSend}
-                  disabled={!isOpenNow()}
-                  className={`flex-1 bg-green-500 text-white font-bold py-3 rounded-lg transition-all shadow-lg flex items-center justify-center gap-2 transform active:scale-95 ${!isOpenNow() ? 'opacity-60 cursor-not-allowed' : 'hover:bg-green-600'}`}
+                  className="flex-1 bg-green-500 text-white font-bold py-3 rounded-lg transition-all shadow-lg flex items-center justify-center gap-2 transform active:scale-95 hover:bg-green-600"
                 >
                   <WhatsappIcon /> Enviar Pedido
                 </button>
@@ -765,28 +758,6 @@ const App = () => {
   return (
     <div className="min-h-screen bg-gray-100 pb-20">
       <Header cartCount={cart.length} onOpenCart={() => setIsCartOpen(true)} onOpenInfo={() => setIsInfoOpen(true)} />
-      {!isOpenNow() && (
-        <div className="container mx-auto px-4 mt-6">
-          <div className="relative overflow-hidden rounded-2xl shadow-lg">
-            <div className="absolute inset-0 bg-gradient-to-r from-shekinah-red via-shekinah-gold to-shekinah-red opacity-90"></div>
-            <div className="relative z-10 p-6 text-white flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                  <i className="fas fa-pizza-slice"></i>
-                </div>
-                <div>
-                  <div className="text-lg font-extrabold tracking-tight">Estamos fora do horário de atendimento</div>
-                  <div className="text-sm">Pedidos disponíveis entre <span className="font-bold">18:00</span> e <span className="font-bold">23:00</span></div>
-                </div>
-              </div>
-              <div className="bg-white/15 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold shadow">
-                Voltamos às 18:00 🍕
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      
 
       {/* Category Navigation */}
       <nav className="sticky top-[64px] z-40 bg-white shadow-sm overflow-x-auto whitespace-nowrap p-4 flex gap-4 no-scrollbar">
@@ -816,13 +787,7 @@ const App = () => {
           {filteredProducts.map((product) => (
             <div 
               key={product.id}
-              onClick={() => {
-                if (isOpenNow()) {
-                  setSelectedProduct(product);
-                } else {
-                  alert('Estamos fechados. Pedidos somente entre 18:00 e 23:00.');
-                }
-              }}
+              onClick={() => setSelectedProduct(product)}
               className="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition-shadow transform hover:-translate-y-1 duration-300 group"
             >
               <div className="h-48 overflow-hidden relative">
