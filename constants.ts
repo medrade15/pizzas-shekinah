@@ -1,7 +1,7 @@
 import { Product, PriceSize, Crust } from './types';
 
 export const PHONE_NUMBER = '5561996125274';
-export const DELIVERY_FEE = 5.00;
+export const DELIVERY_FEE = 8.00;
 
 export const PIZZA_SIZES: PriceSize[] = [
   { label: 'Pequena', slices: 4, price: 50.00 },
@@ -64,15 +64,15 @@ export const PRODUCTS: Product[] = [
   createPizza('15', 'Francesa', 'Mussarela, presunto, ovo, catupiry e orégano.', 'Salgadas'),
   createPizza('16', 'Frango com Catupiry', 'Mussarela, frango, catupiry e orégano.', 'Salgadas'),
   createPizza('17', 'Goiana', 'Mussarela, frango, milho, palmito, azeitona, catupiry e orégano.', 'Salgadas'),
-  createPizza('18', 'Hot Dog', 'Mussarela, salsicha, bacon, batata palha e orégano.', 'Salgadas'),
+  createPizza('18', 'Hot Dog', 'Mussarela, salsicha, bacon,milho,catupiry, batata palha e orégano.', 'Salgadas'),
   createPizza('19', 'Marguerita', 'Mussarela, tomate, alho, azeitona e orégano.', 'Salgadas'),
   createPizza('20', 'Mussarela', 'Mussarela, tomate e orégano.', 'Salgadas'),
   createPizza('21', 'Palmito', 'Mussarela, palmito, alho, bacon e orégano.', 'Salgadas'),
-  createPizza('22', 'Portuguesa', 'Mussarela, presunto, ovo, pimentão, cebola e orégano.', 'Salgadas'),
+  createPizza('22', 'Portuguesa', 'Mussarela, presunto, bacon,ovo, pimentão, cebola e orégano.', 'Salgadas'),
   createPizza('23', 'Presunto', 'Mussarela, presunto, tomate e orégano.', 'Salgadas'),
-  createPizza('24', 'Vegetariana', 'Mussarela, tomate, ervilha, palmito, azeitona e orégano.', 'Salgadas'),
+  createPizza('24', 'Vegetariana', 'Mussarela, tomate, palmito, azeitona e orégano.', 'Salgadas'),
   createPizza('25', 'Shekinah', 'Mussarela, calabresa, milho, ovo, cebola, bacon e orégano.', 'Salgadas'),
-  createPizza('26', 'Tropical', 'Mussarela, frango, milho, ervilha, ovo, catupiry e orégano.', 'Salgadas'),
+  createPizza('26', 'Tropical', 'Mussarela, frango, milho, ovo, catupiry e orégano.', 'Salgadas'),
 
   // Doces
   createPizza('27', 'Banana com Chocolate', 'Mussarela, banana, chocolate, canela e confete.', 'Doces'),
