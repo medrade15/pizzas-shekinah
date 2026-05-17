@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { PRODUCTS, DELIVERY_FEE, PIZZA_SIZES, PHONE_NUMBER, DRINK_FLAVORS } from './constants';
+import { PRODUCTS, DELIVERY_FEE, PIZZA_SIZES, PIZZA_CRUSTS, PHONE_NUMBER, DRINK_FLAVORS } from './constants';
 import { Product, CartItem, Order, Category, PriceSize, Crust } from './types';
 
 // Icons
@@ -227,34 +227,26 @@ const ProductModal = ({
               <div className="mb-6">
                 <h4 className="font-semibold mb-2 text-gray-700">Escolha a Borda:</h4>
                 <div className="space-y-2">
-                   <label className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${!crust ? 'border-shekinah-red bg-red-50' : 'border-gray-200 hover:border-red-200'}`}>
-                      <div className="flex items-center">
-                         <input 
-                            type="radio" 
-                            name="crust" 
-                            className="w-5 h-5 text-shekinah-red focus:ring-shekinah-red border-gray-300"
-                            checked={!crust} 
-                            onChange={() => setCrust(undefined)} 
-                          />
-                         <span className={`ml-3 ${!crust ? 'font-bold text-gray-800' : 'text-gray-600'}`}>Sem Borda Recheada</span>
-                      </div>
-                      <span className="text-sm font-medium text-gray-500">Grátis</span>
-                   </label>
-                   {['Catupiry', 'Cheddar', 'Chocolate', 'Chocolate Branco', 'Doce de Leite'].map(cName => (
-                     <label key={cName} className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${crust?.name === cName ? 'border-shekinah-red bg-red-50' : 'border-gray-200 hover:border-red-200'}`}>
+                   {PIZZA_CRUSTS.map((c) => {
+                     const isSelected = c.price === 0 ? !crust : crust?.name === c.name;
+                     return (
+                     <label key={c.name} className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${isSelected ? 'border-shekinah-red bg-red-50' : 'border-gray-200 hover:border-red-200'}`}>
                         <div className="flex items-center">
                           <input 
                             type="radio" 
                             name="crust" 
                             className="w-5 h-5 text-shekinah-red focus:ring-shekinah-red border-gray-300"
-                            checked={crust?.name === cName} 
-                            onChange={() => setCrust({ name: cName, price: 13.00 })} 
+                            checked={isSelected} 
+                            onChange={() => setCrust(c.price === 0 ? undefined : c)} 
                           />
-                          <span className={`ml-3 ${crust?.name === cName ? 'font-bold text-gray-800' : 'text-gray-600'}`}>{cName}</span>
+                          <span className={`ml-3 ${isSelected ? 'font-bold text-gray-800' : 'text-gray-600'}`}>{c.name}</span>
                         </div>
-                        <span className="font-bold text-shekinah-red">+ R$ 13,00</span>
+                        <span className={`text-sm font-medium ${c.price === 0 ? 'text-gray-500' : 'font-bold text-shekinah-red'}`}>
+                          {c.price === 0 ? 'Grátis' : `+ R$ ${c.price.toFixed(2)}`}
+                        </span>
                      </label>
-                   ))}
+                     );
+                   })}
                 </div>
               </div>
             </>
@@ -815,7 +807,7 @@ const App = () => {
                     {product.isPizza ? 'A partir de' : 'Preço'}
                   </span>
                   <span className="text-xl font-bold text-shekinah-red">
-                     R$ {product.isPizza ? '45,00' : product.basePrice?.toFixed(2)}
+                     R$ {product.isPizza ? PIZZA_SIZES[0].price.toFixed(2) : product.basePrice?.toFixed(2)}
                   </span>
                 </div>
                 <button className="w-full mt-4 bg-gray-100 text-shekinah-green font-bold py-2 rounded hover:bg-shekinah-green hover:text-white transition-colors">
