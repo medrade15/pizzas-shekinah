@@ -21,7 +21,7 @@ const MapIcon = () => <i className="fas fa-map-marked-alt"></i>;
 const isOpenNow = () => {
   const now = new Date();
   const hour = now.getHours();
-  return hour >= 18 && hour < 23;
+  return hour >= 19 && hour < 23;
 };
 
 // 1. Header Component
@@ -74,7 +74,7 @@ const Header = ({ cartCount, onOpenCart, onOpenInfo }: { cartCount: number, onOp
           <div className="mt-1 text-sm">Informações</div>
         </button>
       </div>
-      <div className="mt-4 text-sm text-gray-900">Funcionamento <span className={`font-bold ${isOpenNow() ? 'text-green-600' : 'text-red-600'}`}>{isOpenNow() ? 'ABERTO' : 'FECHADO'}</span> <span className="ml-2 text-gray-500">(18:00 – 23:00)</span></div>
+      <div className="mt-4 text-sm text-gray-900">Funcionamento <span className={`font-bold ${isOpenNow() ? 'text-green-600' : 'text-red-600'}`}>{isOpenNow() ? 'ABERTO' : 'FECHADO'}</span> <span className="ml-2 text-gray-500">(19:00 – 23:00)</span></div>
       <div className="mt-4 max-w-3xl mx-auto bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm p-3 rounded-xl">
         <span className="mr-2"><i className="fas fa-exclamation-triangle"></i></span>
         AVISO: Pedido com pagamento via PIX é obrigatório enviar o comprovante do pagamento no nosso Whatsapp para que seu pedido seja aprovado
@@ -318,6 +318,7 @@ const CartModal = ({
   const [step, setStep] = useState<'cart' | 'checkout'>('cart');
   const [customerName, setCustomerName] = useState('');
   const [addressText, setAddressText] = useState('');
+  const [referencePoint, setReferencePoint] = useState('');
   const [gpsLocation, setGpsLocation] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<Order['paymentMethod']>('Pix');
   const [changeFor, setChangeFor] = useState('');
@@ -325,7 +326,7 @@ const CartModal = ({
   
   // States for Geolocation and Validation
   const [locationLoading, setLocationLoading] = useState(false);
-  const [errors, setErrors] = useState<{name: boolean, address: boolean}>({ name: false, address: false });
+  const [errors, setErrors] = useState<{name: boolean, address: boolean, referencePoint: boolean}>({ name: false, address: false, referencePoint: false });
 
   const subtotal = cart.reduce((acc, item) => acc + item.totalPrice, 0);
   const deliveryFee = fulfillment === 'Entrega' ? DELIVERY_FEE : 0;
@@ -357,12 +358,13 @@ const CartModal = ({
     // Reset errors
     const newErrors = {
         name: !customerName.trim(),
-        address: fulfillment === 'Entrega' ? !addressText.trim() : false
+        address: fulfillment === 'Entrega' ? !addressText.trim() : false,
+        referencePoint: fulfillment === 'Entrega' ? !referencePoint.trim() : false,
     };
     
     setErrors(newErrors);
 
-    if (newErrors.name || newErrors.address) {
+    if (newErrors.name || newErrors.address || newErrors.referencePoint) {
         // Shake animation or scroll to top could be added here
         return;
     }
@@ -374,6 +376,7 @@ const CartModal = ({
     message += `*Tipo:* ${fulfillment}\n`;
     if (fulfillment === 'Entrega') {
       message += `*Endereço:* ${addressText}\n`;
+      message += `*Ponto de referência:* ${referencePoint}\n`;
       if (gpsLocation) {
           message += `*📍 Localização GPS:* ${gpsLocation}\n`;
       }
@@ -528,6 +531,23 @@ const CartModal = ({
                       ></textarea>
                       {errors.address && (
                           <p className="text-red-500 text-xs mt-1">O endereço é obrigatório para a entrega.</p>
+                      )}
+
+                      <label className="block text-sm font-bold text-gray-700 mb-1 mt-4">
+                          Ponto de referência <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                          type="text"
+                          className={`w-full p-3 border rounded-lg outline-none transition-all focus:ring-2 focus:ring-shekinah-red/20 ${errors.referencePoint ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
+                          placeholder="Ex: Próximo ao mercado, casa amarela, portão preto..."
+                          value={referencePoint}
+                          onChange={e => {
+                              setReferencePoint(e.target.value);
+                              if (e.target.value) setErrors(prev => ({ ...prev, referencePoint: false }));
+                          }}
+                      />
+                      {errors.referencePoint && (
+                          <p className="text-red-500 text-xs mt-1">Informe um ponto de referência para concluir o pedido.</p>
                       )}
                     </div>
                   )}
